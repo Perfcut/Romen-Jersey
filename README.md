@@ -14,7 +14,6 @@
     body {
       background-color: #f5f5f5;
       color: #333;
-      padding: 0;
     }
 
     header {
@@ -155,17 +154,23 @@
       z-index: 999;
       display: none;
     }
+
+    #success-message {
+      display: none;
+      text-align: center;
+      margin-top: 1rem;
+      color: green;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <img src="romenlogo.png" alt="Romen Jerseys Logo" class="logo" />
     <div class="title">ROMEN JERSEYS</div>
   </header>
 
-  <!-- HOME PAGE -->
   <section id="home">
     <div class="collections">
       <div class="collection-card" onclick="showJerseyCollection('retro')">
@@ -183,16 +188,12 @@
     </div>
   </section>
 
-  <!-- JERSEY COLLECTION PAGE -->
   <section id="jerseys" class="hidden">
     <h2 style="text-align:center; margin-top:2rem;">Jersey Collection</h2>
     <button class="nav-btn" onclick="showPage('home')">🏠 Home</button>
-    <div class="jersey-grid" id="jerseyGrid">
-      <!-- Jerseys inserted by JS -->
-    </div>
+    <div class="jersey-grid" id="jerseyGrid"></div>
   </section>
 
-  <!-- ORDER FORM PAGE -->
   <section id="order" class="hidden">
     <button class="nav-btn" onclick="showPage('jerseys')">← Back to Jerseys</button>
     <form id="orderForm">
@@ -216,10 +217,15 @@
 
       <button type="submit" class="order-btn">Submit Order</button>
     </form>
+
+    <!-- ✅ Success Message -->
+    <div id="success-message">
+      ✅ Your order is successfully placed!<br />
+      📦 Price and payment details will be sent via WhatsApp.
+    </div>
   </section>
 
   <script>
-    // Data for jerseys
     const jerseyData = {
       retro: [
         {filename: "jerseyretro1.png", name: "Retro Jersey 1", status: "restocked"},
@@ -238,26 +244,22 @@
       ]
     };
 
-    // Show page and hide others
     function showPage(pageId) {
       document.getElementById("home").classList.add("hidden");
       document.getElementById("jerseys").classList.add("hidden");
       document.getElementById("order").classList.add("hidden");
       document.querySelectorAll(".nav-btn").forEach(btn => btn.style.display = "none");
-
       document.getElementById(pageId).classList.remove("hidden");
 
-      // Show nav buttons conditionally
       if(pageId === "jerseys" || pageId === "order") {
         document.querySelector(".nav-btn").style.display = "block";
       }
       window.scrollTo(0,0);
     }
 
-    // Show jersey collection by type
     function showJerseyCollection(type) {
       const container = document.getElementById("jerseyGrid");
-      container.innerHTML = ""; // clear
+      container.innerHTML = "";
 
       jerseyData[type].forEach(jersey => {
         const card = document.createElement("div");
@@ -290,13 +292,12 @@
       showPage("jerseys");
     }
 
-    // Show order form with selected jersey filename
     function showOrderForm(jerseyFilename) {
       document.getElementById("jersey-name").textContent = jerseyFilename;
+      document.getElementById("success-message").style.display = "none"; // Hide message on reopen
       showPage("order");
     }
 
-    // WhatsApp order submission
     document.getElementById("orderForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
@@ -318,11 +319,16 @@ Address: ${address}
 Pincode: ${pincode}
 Special Request: ${request || 'None'}`;
 
-      const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(url, "_blank");
+      // ✅ Show confirmation
+      document.getElementById("success-message").style.display = "block";
+
+      // Open WhatsApp after short delay
+      setTimeout(() => {
+        const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+      }, 2000);
     });
 
-    // Initially show home page
     showPage("home");
   </script>
 
